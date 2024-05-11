@@ -3,9 +3,9 @@ import java.util.Scanner;
 public class Grafo
 {
     Scanner scan = new Scanner(System.in);
-    private int cantidad_Nodos;
-    private Nodo vector_Nodos[];
-    public Matriz_adyacente matriz_adyacente[][];
+    private final int cantidad_Nodos;
+    private Nodo[] vector_Nodos;
+    public Matriz_adyacente[][] matriz_adyacente;
 
     public Grafo(int cantidad)
     {
@@ -97,4 +97,83 @@ public class Grafo
             System.out.println("\n");
         }
     }
+
+    public void dijkstra(String origen, String destino)
+    {
+        int[] array_visitados = new int[cantidad_Nodos];                                    //sirve para conocer las posiciones visitadas anteriormente
+        String[] etiquetas_visitadas = new String[cantidad_Nodos];
+        int fila, columna, posArray = 1, posVisitada = 0;                                   //Declaramos fuera para poder hacer modificaciones de sus valores
+        int arranque = 0, aux = 999, suma = 0;                                              //El aux es para tener el valor mas alto, para ir encontrando el menor en la matriz adyacente
+        String etiqueta = "";
+
+        System.out.println("Entrando a Dijkstra (Kevijstra)");
+
+        for(int i = 0; i<cantidad_Nodos; i++)
+        {
+            array_visitados[i] = 999;                                                           //Seteamos los valores al maximo para de ahi, cambiarlos a la posicion visitada
+            if(vector_Nodos[i].getEtiqueta().equals(origen))
+            {
+                arranque = i;                                                                   //Encontramos la posicion de arranque segun el origen
+            }
+        }
+
+
+        //Inicio de algoritmo de busqueda del elemento menor por fila
+        array_visitados[0] = arranque;                                                          //la primera posicion de los visitados, sera el vector de arranque
+        etiquetas_visitadas[0] = vector_Nodos[arranque].getEtiqueta();
+
+        for (fila = arranque; fila<cantidad_Nodos; fila++)
+        {
+             for(columna = 0; columna<cantidad_Nodos; columna++)
+            {
+                if(!isVisited(array_visitados, columna))
+                {
+                    if(matriz_adyacente[fila][columna].isDato_establecido() &&                  //Verificamos si el nodo de la fila, esta conectado a los nodos de las columnas
+                            aux>matriz_adyacente[fila][columna].getPeso_arista())               //Tambien, si el aux es menor a dicho valor, este ingresara y cambiara el valor
+                    {
+                        aux = matriz_adyacente[fila][columna].getPeso_arista();                 //Seteamos al auxiliar el valor
+                        etiqueta = vector_Nodos[columna].getEtiqueta();                         //Seteamos la etiqueta visita, para despues agregarla al arrary_visitados
+                        posVisitada = columna;
+                        array_visitados[posArray] =posVisitada;
+                        etiquetas_visitadas[posArray] = etiqueta;
+                    }
+                }
+            }
+
+             if(!etiqueta.equals(destino))
+             {
+
+                 fila = posVisitada-1;                                                               //Redireccionamos a la fila anterior, para empezar a verificar dichos elementos
+                 suma+= aux;
+                 posArray++;
+                 aux = 999;
+             }
+             else
+             {
+                 fila = cantidad_Nodos;
+                 suma+= aux;
+             }
+        }
+
+        System.out.println("El peso del viaje es: "+suma);
+        System.out.println("El camino es: ");
+
+        for(int i =0; i<etiquetas_visitadas.length; i++)
+        {
+            System.out.print(" "+etiquetas_visitadas[i]);
+        }
+
+    }
+
+    public boolean isVisited(int[] array, int columna)
+    {
+        for(int i = 0; i< array.length; i++)
+        {
+            if(array[i] == columna)
+                return true;
+        }
+
+        return false;
+    }
+
 }
